@@ -1,0 +1,17 @@
+:root {
+    /* Colours */
+    --color-text: #000000;
+    --color-primary: #f8fa02;
+    --color-secondary: rgba(3, 90, 186, 0.7);
+    --color-dark: rgba(25, 55, 109, 0.7) ;
+    --color-bg: #F4F4F4;
+
+    /* Fonts */
+    --font-roboto: "Roboto";
+
+    /* Tailles de texte */
+    --text-size-small: 15px;
+    --text-size-normal: 25px;
+    --text-size-large: 30px;
+    --text-size-xlarge: 72px;
+}
