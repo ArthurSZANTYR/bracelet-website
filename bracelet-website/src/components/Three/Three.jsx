@@ -1,36 +1,71 @@
-
 import * as THREE from 'three';
+import { useEffect } from 'react';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
-import { useEffect, useRef } from "react";
-
-function Three() {
-  const refContainer = useRef(null);
+const Three = () => {
   useEffect(() => {
-    // === THREE.JS CODE START ===
-    var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    var renderer = new THREE.WebGLRenderer({alpha: true});
+    const camera = new THREE.PerspectiveCamera(
+      10,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    camera.position.z = 1;
+
+    const scene = new THREE.Scene();
+    let bracelet;
+
+    const loader = new GLTFLoader();
+    loader.load(
+      '/assets/three/apple_watch_ultra_2.glb', // Assurez-vous que ce chemin est correct
+      (gltf) => {
+        bracelet = gltf.scene;
+        scene.add(bracelet);
+      },
+      (xhr) => {
+        console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
+      },
+      (error) => {
+        console.error('An error happened', error);
+      }
+    );
+
+    const renderer = new THREE.WebGLRenderer({ alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    // document.body.appendChild( renderer.domElement );
-    // use ref as a mount point of the Three.js scene instead of the document.body
-    refContainer.current && refContainer.current.appendChild( renderer.domElement );
-    var geometry = new THREE.BoxGeometry(1, 1, 1);
-    var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    var cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
-    camera.position.z = 5;
-    var animate = function () {
+    renderer.domElement.style.position = 'fixed';
+    renderer.domElement.style.top = '0';
+    renderer.domElement.style.left = '0';
+    renderer.domElement.style.width = '100%';
+    renderer.domElement.style.height = '100%';
+    renderer.domElement.style.zIndex = '9999'; // Z-index élevé pour qu'il soit devant tout
+
+    const container = document.getElementById('container3D');
+    if (container) {
+      container.appendChild(renderer.domElement);
+    }
+
+    // Ajout des lumières
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.3);
+    scene.add(ambientLight);
+
+    const topLight = new THREE.DirectionalLight(0xffffff, 1);
+    topLight.position.set(500, 500, 500);
+    scene.add(topLight);
+
+    // Boucle d'animation
+    const animate = () => {
       requestAnimationFrame(animate);
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
       renderer.render(scene, camera);
     };
     animate();
+
+    // Nettoyage pour éviter les fuites de mémoire
+    return () => {
+      container.removeChild(renderer.domElement);
+    };
   }, []);
-  return (
-    <div ref={refContainer}></div>
 
-  );
-}
+  return <div id="container3D"></div>;
+};
 
-export default Three
+export default Three;
