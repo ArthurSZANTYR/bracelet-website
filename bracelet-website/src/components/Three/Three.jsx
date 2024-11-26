@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { useEffect } from 'react';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import {gsap} from 'https://cdn.skypack.dev/gsap'
 
 const Three = () => {
   useEffect(() => {
@@ -17,10 +18,13 @@ const Three = () => {
 
     const loader = new GLTFLoader();
     loader.load(
-      '/assets/three/apple_watch_ultra_2.glb', // Assurez-vous que ce chemin est correct
+      '/assets/three/bracelet.gltf', // Assurez-vous que ce chemin est correct
       (gltf) => {
         bracelet = gltf.scene;
+        
         scene.add(bracelet);
+
+        modelMove();
       },
       (xhr) => {
         console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
@@ -44,6 +48,10 @@ const Three = () => {
       container.appendChild(renderer.domElement);
     }
 
+    //helper
+    const axesHelper = new THREE.AxesHelper(1);
+    scene.add(axesHelper);
+
     // Ajout des lumières
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.3);
     scene.add(ambientLight);
@@ -53,11 +61,67 @@ const Three = () => {
     scene.add(topLight);
 
     // Boucle d'animation
-    const animate = () => {
-      requestAnimationFrame(animate);
+    const reRender3D = () => {
+      requestAnimationFrame(reRender3D);
       renderer.render(scene, camera);
     };
-    animate();
+    reRender3D();
+
+    let arrPositionModel = [
+      {
+        id: 'hero',
+        position: {x:-0.045, y:-0.01, z:0.5},
+        rotation: {x:1.5, y:1.57, z:0},
+      },
+      {
+        id: 'about',
+        position: {x:0.01, y:-0.049, z:0.65},
+        rotation: {x:1.5, y:2.5, z:0},
+      },
+    ];
+
+    const modelMove = () => {
+      const sections = document.querySelectorAll('.section');
+      let currentSection;
+      sections.forEach((section) => {
+        const rect = section.getBoundingClientRect();
+        if(rect.top <= window.innerHeight / 3) {
+          currentSection = section.id;
+        }
+      });
+      let position_active = arrPositionModel.findIndex(
+        (val) => val.id == currentSection
+      );
+      if(position_active >= 0){
+        let new_coordinates = arrPositionModel[position_active];
+        gsap.to(bracelet.position, {
+          x: new_coordinates.position.x,
+          y: new_coordinates.position.y,
+          z: new_coordinates.position.z,
+          duration: 1,
+          ease: 'power1.Out'
+        });
+        gsap.to(bracelet.rotation, {
+          x: new_coordinates.rotation.x,
+          y: new_coordinates.rotation.y,
+          z: new_coordinates.rotation.z,
+          duration: 1,
+          ease: 'power1.Out'
+        });
+      }
+
+    }
+    window.addEventListener('scroll', ()=> {
+      if(bracelet){
+        modelMove();
+      }
+    })
+
+    window.addEventListener('resize', () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    })
 
     // Nettoyage pour éviter les fuites de mémoire
     return () => {

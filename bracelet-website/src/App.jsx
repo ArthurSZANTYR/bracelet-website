@@ -7,10 +7,18 @@ import { About } from './components/About/About';
 function App() {
   return (
     <div className={styles.App}>
-      <Three />
-      <Navbar />
-      <Hero />
-      <About />
+      <div id="three">
+        <Three />
+      </div>
+      <div id="navbar">
+        <Navbar />
+      </div>
+      <div class="section" id="hero">
+        <Hero />
+      </div>
+      <div class="section" id="about">
+        <About />
+      </div>
     </div>
   );
 }
