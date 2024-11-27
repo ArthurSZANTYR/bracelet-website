@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import {gsap} from 'https://cdn.skypack.dev/gsap'
 
+
 const Three = () => {
   useEffect(() => {
     const camera = new THREE.PerspectiveCamera(
@@ -14,17 +15,33 @@ const Three = () => {
     camera.position.z = 1;
 
     const scene = new THREE.Scene();
+    
     let bracelet;
 
     const loader = new GLTFLoader();
     loader.load(
-      '/assets/three/bracelet.gltf', // Assurez-vous que ce chemin est correct
+      '/assets/three/bracelet.gltf', 
       (gltf) => {
         bracelet = gltf.scene;
         
         scene.add(bracelet);
 
-        modelMove();
+        const ledArray = [];
+        // Traverse the model to group LEDs logically
+        bracelet.traverse((child) => {
+          if (child.name.includes('led')) {
+              ledArray.push(child); // Add the group of meshes as one LED
+            //console.log(ledMeshes);
+          }
+        });
+        //reorganize led
+        const led4Index = 0;
+        const led4 = ledArray.splice(led4Index, 1)[0]; // Remove led4 from the array
+        const middleIndex = Math.floor(ledArray.length / 2); // Find the middle of the array
+        ledArray.splice(middleIndex, 0, led4); // Insert led4 at the middle
+      
+        modelMove(ledArray);
+        //animateLEDs(ledArray);
       },
       (xhr) => {
         console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
@@ -49,8 +66,8 @@ const Three = () => {
     }
 
     //helper
-    const axesHelper = new THREE.AxesHelper(1);
-    scene.add(axesHelper);
+    //const axesHelper = new THREE.AxesHelper(1);
+    //scene.add(axesHelper);
 
     // Ajout des lumières
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.3);
@@ -80,7 +97,7 @@ const Three = () => {
       },
     ];
 
-    const modelMove = () => {
+    const modelMove = (ledArray) => {
       const sections = document.querySelectorAll('.section');
       let currentSection;
       sections.forEach((section) => {
@@ -109,8 +126,36 @@ const Three = () => {
           ease: 'power1.Out'
         });
       }
-
+      animateLEDs(ledArray);
     }
+
+    // Animate the first LED in progression
+    const animateLEDs = (ledArray) => {
+      // Create a new material with red color for the LED glow effect
+      const newMaterial = new THREE.MeshStandardMaterial({
+        color: 0xff0000, // Red color
+        emissive: 0xff0000, // Red emissive for glow effect
+        metalness: 0.5, // Metallic effect
+        roughness: 0.2 // Roughness for the surface
+      });
+    
+      // Function to light up LEDs one after the other
+      const lightUpLED = (index) => {
+        if (index >= ledArray.length) return; // Stop when all LEDs are lit
+    
+        ledArray[index].children.forEach((meshes) => {
+          meshes.material = newMaterial; // Change material to light up the LED
+        });
+    
+        // Call the function again for the next LED with a delay
+        setTimeout(() => lightUpLED(index + 1), 400); // Adjust the delay as needed (200ms here)
+      };
+    
+      // Start the animation from the first LED
+      lightUpLED(0);
+    };
+    
+
     window.addEventListener('scroll', ()=> {
       if(bracelet){
         modelMove();
