@@ -20,7 +20,7 @@ const Three = () => {
 
     const loader = new GLTFLoader();
     loader.load(
-      '/assets/three/bracelet.gltf', 
+      '/assets/three/bracelet.glb', 
       (gltf) => {
         bracelet = gltf.scene;
         
@@ -39,6 +39,8 @@ const Three = () => {
         const led4 = ledArray.splice(led4Index, 1)[0]; // Remove led4 from the array
         const middleIndex = Math.floor(ledArray.length / 2); // Find the middle of the array
         ledArray.splice(middleIndex, 0, led4); // Insert led4 at the middle
+
+        console.log(ledArray);
       
         modelMove(ledArray);
         //animateLEDs(ledArray);
@@ -135,25 +137,24 @@ const Three = () => {
       const newMaterial = new THREE.MeshStandardMaterial({
         color: 0xff0000, // Red color
         emissive: 0xff0000, // Red emissive for glow effect
-        metalness: 0.5, // Metallic effect
-        roughness: 0.2 // Roughness for the surface
+        metalness: 0.9, // Metallic effect
+        roughness: 0.1, // Roughness for the surface
       });
     
       // Function to light up LEDs one after the other
       const lightUpLED = (index) => {
         if (index >= ledArray.length) return; // Stop when all LEDs are lit
     
-        ledArray[index].children.forEach((meshes) => {
-          meshes.material = newMaterial; // Change material to light up the LED
-        });
+        ledArray[index].material = newMaterial; // Change material to light up the LED
     
         // Call the function again for the next LED with a delay
-        setTimeout(() => lightUpLED(index + 1), 400); // Adjust the delay as needed (200ms here)
+        setTimeout(() => lightUpLED(index + 1), 250); // Adjust the delay as needed
       };
     
       // Start the animation from the first LED
       lightUpLED(0);
     };
+    
     
 
     window.addEventListener('scroll', ()=> {
