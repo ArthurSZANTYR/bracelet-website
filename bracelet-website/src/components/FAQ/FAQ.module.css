@@ -1,0 +1,47 @@
+@import "../../vars.css";
+
+.wrapper{
+    display: flex;
+    height: 50vh;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 200px;
+}
+
+.accordeon{
+    width: 1000px;
+    z-index: 99;
+}
+
+.item{
+    background: rgba(25, 55, 109, 0.7);
+    margin-bottom: 5px;
+    padding: 10px 20px;
+    border-radius: 15px;
+}
+
+.title{
+    cursor: pointer;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    font-size: var(--text-size-normal);
+    font-family: var(--font-roboto);
+    font-weight: 700;
+    letter-spacing: 1.75px;
+}
+
+.content{
+    color: white;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0,1,0,1);
+}
+
+.content.show{
+    height: auto;
+    max-height: 9999px ;
+    transition: all 0.5s cubic-bezier(0,1,0,1);
+}

@@ -1,47 +1,41 @@
-@import "../../vars.css";
-
 .container {
     position: relative;
     display: flex;
-    flex-direction: column; /* Change à column pour centrer verticalement */
-    align-items: center; /* Centre horizontalement */
-    justify-content: flex-end; /* Aligne le contenu en bas */
-    margin: 0 10%; /* Ajuste les marges gauche et droite */
-    padding-top: 500px; /* Laisse de l'espace au-dessus (dans le container */
-    /*height: 100vh; /* Prend toute la hauteur de la fenêtre */
-    z-index: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    margin: 0 10%;
+    padding-top: 500px;
+    /*z-index: 2; /* Plus élevé que la scène 3D mais plus bas que les éléments du dessus */
 }
 
 .content {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centre le contenu à l'intérieur */
+    align-items: center;
     color: var(--color-text);
-    z-index: 1;
+    z-index: 3; /* Les titres et le contenu doivent être au-dessus de la scène 3D */
 }
 
-
-.title{
+.title {
     font-size: var(--text-size-xlarge);
     font-weight: 900;
     margin-bottom: 33px;
     font-family: var(--font-roboto);
-    background: linear-gradient(
-        90deg, 
-        rgba(0, 0, 0, 1) 70%, 
-        rgba(255, 255, 255, 0) 120%
-        );
+    background: linear-gradient(90deg, rgba(0, 0, 0, 1) 70%, rgba(255, 255, 255, 0) 120%);
     -webkit-text-fill-color: transparent;
     -webkit-background-clip: text;
+    z-index: 4; /* Au-dessus du modèle 3D */
 }
 
-.description{
+.description {
     font-size: var(--text-size-large);
     font-family: var(--font-roboto);
     margin-bottom: 52px;
+    z-index: 4; /* Les descriptions aussi au-dessus du modèle 3D */
 }
 
-.contactBtn{
+.contactBtn {
     text-decoration: none;
     background-color: var(--color-primary);
     color: var(--color-text);
@@ -50,66 +44,41 @@
     font-weight: 600;
     padding: 17px 26px;
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.25);
+    z-index: 5; /* Le bouton doit être le plus haut */
 }
 
-.heroImg{
+.heroImg {
     width: 50%;
-    z-index: 1;
-
+    z-index: 1; /* Le modèle 3D doit être en dessous */
     animation-name: floating;
     animation-duration: 3s;
     animation-iteration-count: infinite;
     animation-timing-function: ease-in-out;
 }
 
-@keyframes floating{
-    0%{
-        transform: translate(0, 0px);
-    }
-    50%{
-        transform: translate(0, 10px);
-    }
-    100%{
-        transform: translate(0, -0px);
-    }   
-}
-
-.topBlur{
+/* Flou arrière-plan */
+.topBlur {
     position: absolute;
     width: 50vw;
     height: 50vw;
-    min-width: 350px;
     min-width: 350px;
     top: -128px;
     left: 10vw;
     border-radius: 764px;
     background: rgba(25, 55, 109, 0.7);
     filter: blur(100px);
-    z-index: 0;
+    z-index: 0; /* Au fond, derrière tout */
 }
 
-.bottomBlur{
+.bottomBlur {
     position: absolute;
     width: 70vw;
     height: 50vw;
     min-width: 350px;
-    min-width: 250px;
     top: 246px;
     left: -25vw;
-    border-radius : 764px;
+    border-radius: 764px;
     background: rgba(25, 55, 109, 0.7);
     filter: blur(100px);
-    z-index: 0;
-}
-
-@media screen and (max-width: 830px){
-    .container{
-        flex-direction: column;
-    }
-
-    .content{
-        align-items: center;
-    }
-
-    
+    z-index: 0; /* Au fond, derrière tout */
 }

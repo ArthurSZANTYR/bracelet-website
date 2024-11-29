@@ -60,7 +60,8 @@ const Three = () => {
     renderer.domElement.style.left = '0';
     renderer.domElement.style.width = '100%';
     renderer.domElement.style.height = '100%';
-    renderer.domElement.style.zIndex = '9999'; // Z-index élevé pour qu'il soit devant tout
+    renderer.domElement.style.zIndex = '7'; // Z-index élevé pour qu'il soit devant tout
+    renderer.domElement.style.pointerEvents = "none";
 
     const container = document.getElementById('container3D');
     if (container) {
@@ -96,6 +97,11 @@ const Three = () => {
         id: 'about',
         position: {x:0.01, y:-0.049, z:0.65},
         rotation: {x:1.5, y:2.5, z:0},
+      },
+      {
+        id: 'FAQ',
+        position: {x:0.05, y:-0.01, z:0.5},
+        rotation: {x:0.4, y:-1.56, z:0},
       },
     ];
 
