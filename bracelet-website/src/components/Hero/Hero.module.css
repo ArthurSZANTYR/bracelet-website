@@ -6,7 +6,6 @@
     justify-content: flex-end;
     margin: 0 10%;
     padding-top: 500px;
-    /*z-index: 2; /* Plus élevé que la scène 3D mais plus bas que les éléments du dessus */
 }
 
 .content {
@@ -14,7 +13,7 @@
     flex-direction: column;
     align-items: center;
     color: var(--color-text);
-    z-index: 3; /* Les titres et le contenu doivent être au-dessus de la scène 3D */
+   
 }
 
 .title {
@@ -25,14 +24,14 @@
     background: linear-gradient(90deg, rgba(0, 0, 0, 1) 70%, rgba(255, 255, 255, 0) 120%);
     -webkit-text-fill-color: transparent;
     -webkit-background-clip: text;
-    z-index: 4; /* Au-dessus du modèle 3D */
+    z-index: 11; /* Au-dessus du modèle 3D */
 }
 
 .description {
     font-size: var(--text-size-large);
     font-family: var(--font-roboto);
     margin-bottom: 52px;
-    z-index: 4; /* Les descriptions aussi au-dessus du modèle 3D */
+    z-index: 11; /* Les descriptions aussi au-dessus du modèle 3D */
 }
 
 .contactBtn {

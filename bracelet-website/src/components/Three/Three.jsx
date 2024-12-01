@@ -17,23 +17,29 @@ const Three = () => {
     let bracelet;
     let originalMaterials = [];
     let animationInterval;
+    let ledArray = []; // Ensure ledArray is scoped and accessible throughout
 
     const loader = new GLTFLoader();
     loader.load(
       '/assets/three/bracelet.glb',
       (gltf) => {
         bracelet = gltf.scene;
+        if (!bracelet) {
+          console.error("Bracelet model not loaded.");
+          return;
+        }
         scene.add(bracelet);
 
-        const ledArray = [];
         bracelet.traverse((child) => {
           if (child.name.includes('led')) {
             ledArray.push(child);
-            originalMaterials.push(child.material); // Sauvegarde des matériaux originaux
+            originalMaterials.push(child.material);
+            console.log(`LED found: ${child.name}`); // Debug
           }
         });
+        console.log("LED Array:", ledArray);
 
-        // Réorganiser les LEDs si nécessaire
+        // Rearrange the LEDs if necessary
         const led4Index = 0;
         const led4 = ledArray.splice(led4Index, 1)[0];
         const middleIndex = Math.floor(ledArray.length / 2);
@@ -82,92 +88,119 @@ const Three = () => {
         id: 'hero',
         position: { x: -0.045, y: -0.01, z: 0.5 },
         rotation: { x: 1.5, y: 1.57, z: 0 },
+        animation: 'sequential',
       },
       {
         id: 'about',
         position: { x: 0.01, y: -0.049, z: 0.65 },
         rotation: { x: 1.5, y: 2.5, z: 0 },
+        animation: 'blinking',
       },
       {
         id: 'FAQ',
         position: { x: 0.05, y: -0.01, z: 0.5 },
         rotation: { x: 0.4, y: -1.56, z: 0 },
+        animation: 'random',
       },
     ];
 
-    const resetLEDs = (ledArray) => {
-      ledArray.forEach((led, index) => {
-        led.material = originalMaterials[index]; // Réapplique les matériaux d'origine
-      });
-    };
+    let currentAnimation = null;
 
     const animateLEDs = (ledArray, animationType) => {
+      if (!ledArray || ledArray.length === 0) {
+        console.warn("LED array is empty or undefined.");
+        return;
+      }
+    
+      if (!animationType) {
+        if (animationInterval) clearInterval(animationInterval);
+        currentAnimation = null;
+        return;
+      }
+    
+      if (currentAnimation === animationType) return;
+      currentAnimation = animationType;
+    
       if (animationInterval) clearInterval(animationInterval);
-
-      if (animationType === 'sequential') {
-        const newMaterial = new THREE.MeshStandardMaterial({
-          color: 0xff0000,
-          emissive: 0xff0000,
+    
+      const createMaterial = (color) =>
+        new THREE.MeshStandardMaterial({
+          color,
+          emissive: color,
           metalness: 0.9,
           roughness: 0.1,
         });
-
-        const lightUpLED = (index) => {
-          if (index >= ledArray.length) return;
-          ledArray[index].material = newMaterial;
-          setTimeout(() => lightUpLED(index + 1), 250);
+      
+        const resetMaterial = (index) => {
+          if (ledArray[index]) {
+            ledArray[index].material = originalMaterials[index];
+          } else {
+            console.warn(`LED at index ${index} is undefined.`);
+          }
         };
+        
 
-        lightUpLED(0);
-      } else if (animationType === 'blinking') {
-        const newMaterial = new THREE.MeshStandardMaterial({
-          color: 0x00ff00,
-          emissive: 0x00ff00,
-          metalness: 0.9,
-          roughness: 0.1,
-        });
-
-        let isLit = false;
-        animationInterval = setInterval(() => {
-          isLit = !isLit;
-          ledArray.forEach((led) => {
-            led.material = isLit
-              ? newMaterial
-              : originalMaterials[ledArray.indexOf(led)];
-          });
-        }, 500);
-      } else if (animationType === 'random') {
-        animationInterval = setInterval(() => {
-          const randomIndex = Math.floor(Math.random() * ledArray.length);
-          ledArray[randomIndex].material = new THREE.MeshStandardMaterial({
-            color: 0x0000ff,
-            emissive: 0x0000ff,
-            metalness: 0.9,
-            roughness: 0.1,
-          });
-
-          setTimeout(() => {
-            ledArray[randomIndex].material = originalMaterials[randomIndex];
+      console.log(animationType);
+      switch (animationType) {
+        case 'sequential':
+          let index = 0;
+          animationInterval = setInterval(() => {
+            if (index >= ledArray.length) {
+              clearInterval(animationInterval);
+              return;
+            }
+            ledArray[index].material = createMaterial(0xff0000);
+            setTimeout(() => resetMaterial(index), 250);
+            index++;
+          }, 250);
+          break;
+        
+        case 'blinking':
+          let isLit = false;
+          animationInterval = setInterval(() => {
+            isLit = !isLit;
+            ledArray.forEach((led, i) => {
+              led.material = isLit ? createMaterial(0x00ff00) : originalMaterials[i];
+            });
+          }, 500);
+          break;
+        
+        case 'random':
+          animationInterval = setInterval(() => {
+            const randomIndex = Math.floor(Math.random() * ledArray.length);
+            ledArray[randomIndex].material = createMaterial(0xff0000);
+            setTimeout(() => resetMaterial(randomIndex), 250);
+            
           }, 300);
-        }, 300);
+          break;
+        
+        default:
+          console.warn('Unknown animation type:', animationType);
       }
     };
 
     const modelMove = (ledArray) => {
       const sections = document.querySelectorAll('.section');
-      let currentSection;
+      let currentSection = null;
+    
       sections.forEach((section) => {
         const rect = section.getBoundingClientRect();
         if (rect.top <= window.innerHeight / 3) {
           currentSection = section.id;
         }
       });
-
-      let position_active = arrPositionModel.findIndex(
-        (val) => val.id === currentSection
-      );
-      if (position_active >= 0) {
-        let new_coordinates = arrPositionModel[position_active];
+    
+      if (!currentSection) {
+        console.warn("No active section found.");
+        animateLEDs(ledArray, null);
+        return;
+      }
+    
+      const new_coordinates = arrPositionModel.find((val) => val.id === currentSection);
+    
+      if (new_coordinates) {
+        animateLEDs(ledArray, new_coordinates.animation);
+      
         gsap.to(bracelet.position, {
           x: new_coordinates.position.x,
           y: new_coordinates.position.y,
@@ -175,6 +208,7 @@ const Three = () => {
           duration: 1,
           ease: 'power1.Out',
         });
+      
         gsap.to(bracelet.rotation, {
           x: new_coordinates.rotation.x,
           y: new_coordinates.rotation.y,
@@ -182,22 +216,12 @@ const Three = () => {
           duration: 1,
           ease: 'power1.Out',
         });
-
-        resetLEDs(ledArray);
-
-        if (currentSection === 'hero') {
-          animateLEDs(ledArray, 'sequential');
-        } else if (currentSection === 'about') {
-          animateLEDs(ledArray, 'blinking');
-        } else if (currentSection === 'FAQ') {
-          animateLEDs(ledArray, 'random');
-        }
       }
     };
 
     window.addEventListener('scroll', () => {
-      if (bracelet) {
-        modelMove();
+      if (bracelet && ledArray.length > 0) {
+        modelMove(ledArray);
       }
     });
 
