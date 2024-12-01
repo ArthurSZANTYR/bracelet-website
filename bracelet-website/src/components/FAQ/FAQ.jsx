@@ -16,7 +16,7 @@ export const FAQ = () => {
     }
 
     return(
-        <div className={styles.wrapper}>
+        <div className={styles.wrapper} id='FAQ'>
             <div className={styles.accordeon}>
 
                 {data.map((item, i) => (

@@ -14,27 +14,27 @@
 }
 
 .item{
-    background: rgba(25, 55, 109, 0.7);
+    background: rgba(25, 55, 109, 0.9);
     margin-bottom: 5px;
     padding: 10px 20px;
     border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
 }
 
 .title{
+    color: var(--color-bg);
     cursor: pointer;
-    color: white;
     display: flex;
     justify-content: space-between;
     align-items: center;
 
     font-size: var(--text-size-normal);
-    font-family: var(--font-roboto);
-    font-weight: 700;
-    letter-spacing: 1.75px;
+    font-weight: 600;
 }
 
 .content{
-    color: white;
+    color: var(--color-bg);
+    font-size: var(--text-size-normal);
     max-height: 0;
     overflow: hidden;
     transition: all 0.5s cubic-bezier(0,1,0,1);
